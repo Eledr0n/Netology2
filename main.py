@@ -1,5 +1,4 @@
 def load_recipes_from_file(filename):
-    "Читает список рецептов из файла и возвращает словарь cook_book."
     cook_book = {}
     try:
         with open(filename, 'r') as file:
@@ -38,7 +37,6 @@ def save_recipes_to_file(filename, cook_book):
 
 
 def show_recipe(cook_book, dish_name):
-    "Пункт 1"
     recipe = cook_book.get(dish_name)
     if recipe:
         print(f"\nРецепт для {dish_name}:")
@@ -49,7 +47,6 @@ def show_recipe(cook_book, dish_name):
 
 
 def add_new_recipe(cook_book):
-    "Пункт 2"
     dish_name = input("Введите название блюда: ")
     if dish_name in cook_book:
         print("Рецепт с таким названием уже существует.")
@@ -81,7 +78,6 @@ def add_new_recipe(cook_book):
 
 
 def display_cook_book(cook_book):
-    "Пункт 3"
     if cook_book:
         print("\nКулинарная книга:")
         for dish_name, ingredients in cook_book.items():
@@ -93,7 +89,6 @@ def display_cook_book(cook_book):
 
 
 def get_shop_list_by_dishes(dishes, person_count, cook_book):
-    "Пункт 4"
     shop_list = {}
 
     for dish in dishes:
@@ -101,14 +96,12 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
             ingredients = cook_book[dish]
             for ingredient in ingredients:
                 name = ingredient['ingredient_name']
-                quantity = ingredient['quantity'] * person_count  # Умножаем количество на число персон
+                quantity = ingredient['quantity'] * person_count
                 measure = ingredient['measure']
 
                 if name in shop_list:
-                    # Если ингредиент уже есть в списке, увеличиваем его количество
                     shop_list[name]['quantity'] += quantity
                 else:
-                    # Если ингредиента еще нет, добавляем его
                     shop_list[name] = {'measure': measure, 'quantity': quantity}
         else:
             print(f"Блюдо {dish} не найдено в кулинарной книге.")
@@ -117,10 +110,39 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
 
 
 def display_shop_list(shop_list):
-    "Отображение пункта 4"
     print("\nСписок покупок:")
     for name, info in shop_list.items():
         print(f"{name}: {info['quantity']} {info['measure']}")
+
+
+def read_file(file_name):
+    with open(file_name, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+    return lines
+
+
+def write_combined_file(output_file, sorted_files):
+    with open(output_file, 'w', encoding='utf-8') as file:
+        for file_name, lines in sorted_files:
+            file.write(f"{file_name}\n")
+            file.write(f"{len(lines)}\n")
+            file.writelines(lines)
+            file.write("\n")
+
+
+def combine_files(file1, file2, output_file):
+
+    file1_lines = read_file(file1)
+    file2_lines = read_file(file2)
+
+    files_with_content = [
+        (file1, file1_lines),
+        (file2, file2_lines)
+    ]
+
+    sorted_files = sorted(files_with_content, key=lambda x: len(x[1]))
+
+    write_combined_file(output_file, sorted_files)
 
 
 def display_menu():
@@ -129,7 +151,8 @@ def display_menu():
     print("2. Добавить рецепт")
     print("3. Показать все рецепты")
     print("4. Получить список покупок")
-    print("5. Сохранить и выйти")
+    print("5. Объединить два файла")
+    print("6. Сохранить и выйти")
     return input("Выберите действие: ")
 
 
@@ -145,7 +168,7 @@ def main(filename):
         elif choice == '2':
             add_new_recipe(cook_book)
         elif choice == '3':
-            display_cook_book(cook_book)
+            display_cook_book(cook_book)  # Показать весь словарь
         elif choice == '4':
             dishes = input("Введите названия блюд через запятую: ").split(', ')
             try:
@@ -155,6 +178,12 @@ def main(filename):
             except ValueError:
                 print("Количество персон должно быть числом.")
         elif choice == '5':
+            file1 = input("Введите имя первого файла: ")
+            file2 = input("Введите имя второго файла: ")
+            output_file = input("Введите имя результирующего файла: ")
+            combine_files(file1, file2, output_file)
+            print(f"Файлы {file1} и {file2} успешно объединены в {output_file}.")
+        elif choice == '6':
             save_recipes_to_file(filename, cook_book)
             print("Рецепты сохранены. Выход.")
             break
